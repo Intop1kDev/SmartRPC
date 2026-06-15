@@ -62,7 +62,7 @@ while True:
         if until_afk == 0:
             is_afk = True
     else:
-        until_afk == 4
+        until_afk = 4
         is_afk = False
     
     if not is_afk:
