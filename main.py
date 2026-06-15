@@ -10,7 +10,7 @@ RPC.connect()
 
 start_time = time.time()
 
-icons = {
+rpc_icons = {
     "Visual Studio Code": "vscode",
     "Discord": "discord",
     "Vivaldi": "vivaldi",
@@ -20,8 +20,13 @@ icons = {
     "cmd.exe": "terminal",
     "Happ ": "happ",
     "Блокнот": "notepad",
-    "Microsoft Edge": "edge"
+    "Edge": "edge",
+    "Program Manager": "windows"
 }
+
+rpc_buttons = [
+            {"label": "GitHub", "url": "https://github.com/Intop1kDev/SmartRPC"}
+]
 
 def getWindowText():
     hwnd = user32.GetForegroundWindow()
@@ -39,22 +44,39 @@ def getCursorPos():
         ]
     cords = POINT()
     user32.GetCursorPos(ctypes.byref(cords))
-    return cords.x, cords.y
+    return (cords.x, cords.y)
 
 print(time.time())
 
 time.sleep(1)
 
+is_afk = False
+until_afk = 4
+prev_x, prev_y = (0, 0)
+
 while True:
-    x, y = getCursorPos()
-    windowText = getWindowText()
+    (x, y) = getCursorPos()
 
-    image = "unknown"
+    if (x, y) == (prev_x, prev_y):  
+        until_afk -= 1
+        if until_afk == 0:
+            is_afk = True
+    else:
+        until_afk == 4
+        is_afk = False
+    
+    if not is_afk:
+        windowText = getWindowText()
 
-    for key, value in icons.items():
-        if key in windowText:
-            image = value
-            windowText = key
+        image = "unknown"
+
+        for key, value in rpc_icons.items():
+            if key in windowText:
+                image = value
+                windowText = key
+    else:
+        windowText = "AFK"
+        image = "afk"
 
     RPC.update(
     state="ShitRPC V0.1",
@@ -62,8 +84,8 @@ while True:
     name=windowText,
     start=start_time,
     large_image=image,
-    buttons=[
-        {"label": "GitHub", "url": "https://github.com"}
-    ]
-)
+    buttons=rpc_buttons
+    )
+    prev_x = x
+    prev_y = y
     time.sleep(15)
