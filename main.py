@@ -31,7 +31,8 @@ class _POINT(ctypes.Structure):
             ("x", ctypes.c_long),
             ("y", ctypes.c_long)
         ]
-class WinAPIFunctions():
+
+class WinAPIFunctions:
     _user32 = ctypes.windll.user32
 
     @staticmethod
@@ -48,42 +49,46 @@ class WinAPIFunctions():
         WinAPIFunctions._user32.GetCursorPos(ctypes.byref(cords))
         return (cords.x, cords.y)
 
-is_afk = False
-until_afk = 4
-prev_x, prev_y = (0, 0)
+def main():
+    is_afk = False
+    until_afk = 4
+    prev_x, prev_y = (0, 0)
 
-while True:
-    (x, y) = WinAPIFunctions.get_cursor_pos()
+    while True:
+        (x, y) = WinAPIFunctions.get_cursor_pos()
 
-    if (x, y) == (prev_x, prev_y):  
-        until_afk -= 1
-        if until_afk == 0:
-            is_afk = True
-    else:
-        until_afk = 4
-        is_afk = False
-    
-    if not is_afk:
-        windowText = WinAPIFunctions.get_window_text()
+        if (x, y) == (prev_x, prev_y):  
+            until_afk -= 1
+            if until_afk == 0:
+                is_afk = True
+        else:
+            until_afk = 4
+            is_afk = False
+        
+        if not is_afk:
+            windowText = WinAPIFunctions.get_window_text()
 
-        image = "unknown"
+            image = "unknown"
 
-        for key, value in rpc_icons.items():
-            if key in windowText:
-                image = value
-                windowText = key
-    else:
-        windowText = "AFK"
-        image = "afk"
+            for key, value in rpc_icons.items():
+                if key in windowText:
+                    image = value
+                    windowText = key
+        else:
+            windowText = "AFK"
+            image = "afk"
 
-    RPC.update(
-    state="ShitRPC V0.2",
-    details=f"MousePos: {x}, {y}",
-    name=windowText,
-    start=START_TIME,
-    large_image=image,
-    buttons=rpc_buttons
-    )
-    prev_x = x
-    prev_y = y
-    time.sleep(15)
+        RPC.update(
+        state="ShitRPC V0.2",
+        details=f"MousePos: {x}, {y}",
+        name=windowText,
+        start=START_TIME,
+        large_image=image,
+        buttons=rpc_buttons
+        )
+        prev_x = x
+        prev_y = y
+        time.sleep(15)
+
+if __name__ == "__main__":
+    main()
