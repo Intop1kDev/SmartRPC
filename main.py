@@ -2,13 +2,11 @@ from pypresence import Presence
 import time
 import ctypes
 
-user32 = ctypes.windll.user32
-
-cli_id = "1516069274119180328"
-RPC = Presence(cli_id)
+CLIENT_ID = "1516069274119180328"
+RPC = Presence(CLIENT_ID)
 RPC.connect()
 
-start_time = time.time()
+START_TIME = time.time()
 
 rpc_icons = {
     "Visual Studio Code": "vscode",
@@ -25,37 +23,37 @@ rpc_icons = {
 }
 
 rpc_buttons = [
-            {"label": "GitHub", "url": "https://github.com/Intop1kDev/SmartRPC"}
+    {"label": "GitHub", "url": "https://github.com/Intop1kDev/SmartRPC"}
 ]
 
-def getWindowText():
-    hwnd = user32.GetForegroundWindow()
-    buffer = ctypes.create_unicode_buffer(256)
-
-    user32.GetWindowTextW(hwnd, ctypes.byref(buffer), ctypes.sizeof(buffer))
-
-    return buffer.value
-
-def getCursorPos():
-    class POINT(ctypes.Structure):
+class _POINT(ctypes.Structure):
         _fields_ = [
             ("x", ctypes.c_long),
             ("y", ctypes.c_long)
         ]
-    cords = POINT()
-    user32.GetCursorPos(ctypes.byref(cords))
-    return (cords.x, cords.y)
+class WinAPIFunctions():
+    _user32 = ctypes.windll.user32
 
-print(time.time())
+    @staticmethod
+    def get_window_text():
+        hwnd = WinAPIFunctions._user32.GetForegroundWindow()
+        buffer = ctypes.create_unicode_buffer(256)
 
-time.sleep(1)
+        WinAPIFunctions._user32.GetWindowTextW(hwnd, ctypes.byref(buffer), ctypes.sizeof(buffer))
+
+        return buffer.value
+    @staticmethod
+    def get_cursor_pos():
+        cords = _POINT()
+        WinAPIFunctions._user32.GetCursorPos(ctypes.byref(cords))
+        return (cords.x, cords.y)
 
 is_afk = False
 until_afk = 4
 prev_x, prev_y = (0, 0)
 
 while True:
-    (x, y) = getCursorPos()
+    (x, y) = WinAPIFunctions.get_cursor_pos()
 
     if (x, y) == (prev_x, prev_y):  
         until_afk -= 1
@@ -66,7 +64,7 @@ while True:
         is_afk = False
     
     if not is_afk:
-        windowText = getWindowText()
+        windowText = WinAPIFunctions.get_window_text()
 
         image = "unknown"
 
@@ -79,10 +77,10 @@ while True:
         image = "afk"
 
     RPC.update(
-    state="ShitRPC V0.1",
+    state="ShitRPC V0.2",
     details=f"MousePos: {x}, {y}",
     name=windowText,
-    start=start_time,
+    start=START_TIME,
     large_image=image,
     buttons=rpc_buttons
     )
